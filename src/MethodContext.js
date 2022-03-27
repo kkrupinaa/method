@@ -1,3 +1,4 @@
+import { threadId } from 'worker_threads';
 import { EventEmitter } from './EventEmitter';
 
 /*
@@ -8,8 +9,19 @@ import { EventEmitter } from './EventEmitter';
  */
 export const obj = {
     count: 0,
-    subscribe() {},
-    unsubscribe() {},
+    fun(obj1) {
+        return () => {
+            obj1.count++;
+        };
+    },
+    obr: {},
+    subscribe() {
+        this.obr = this.fun(obj);
+        EventEmitter.on('click', this.obr);
+    },
+    unsubscribe() {
+        EventEmitter.off('click', this.obr);
+    },
 };
 
 /*
@@ -19,7 +31,9 @@ obj1.first(1, 2, 3);
 // Внутренний вызов должен быть равносилен obj1.second(3, 2, 1)
  */
 export const obj1 = {
-    first(...args) {},
+    first(...args) {
+        this.second(...args.reverse());
+    },
     second() {
         // здесь ничего писать не нужно
     },
